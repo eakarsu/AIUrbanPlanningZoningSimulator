@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   FaCar, FaUsers, FaBuilding, FaMapMarkerAlt, FaLeaf, FaVolumeUp,
-  FaTree, FaMap, FaFileAlt, FaCity, FaRoad, FaHospital
+  FaTree, FaMap, FaFileAlt, FaCity, FaRoad, FaHospital,
+  FaShieldAlt, FaUserCheck, FaExchangeAlt, FaChartLine
 } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 
@@ -21,6 +22,15 @@ const aiFeatures = [
   { key: 'green-space', name: 'Green Space Planning', desc: 'Optimize urban green space distribution and quality', icon: FaTree, color: '#15803d', endpoint: '/api/green-space' },
 ];
 
+const advancedFeatures = [
+  { key: 'gis-map', name: 'GIS Map View', desc: 'Spatial layer toggles, draw-to-create, click-to-inspect', icon: FaMap, color: '#2563eb', endpoint: null },
+  { key: 'simulator', name: 'Real Simulator', desc: 'Deterministic traffic micro-sim + cohort population projection', icon: FaChartLine, color: '#7c3aed', endpoint: null },
+  { key: 'compliance-engine', name: 'Compliance Engine', desc: 'Cross-table rule check: zone vs permit vs noise vs environment', icon: FaShieldAlt, color: '#059669', endpoint: null },
+  { key: 'citizen-portal', name: 'Citizen Portal', desc: 'Public address lookup + permit submission with documents', icon: FaUserCheck, color: '#0891b2', endpoint: null },
+  { key: 'scenario-workbench', name: 'Scenario Workbench', desc: 'Clone, mutate, re-run dependent sims, diff vs baseline', icon: FaExchangeAlt, color: '#dc2626', endpoint: null },
+  { key: 'ai-advisor', name: 'AI Advisor', desc: 'Scenario comparison + comprehensive impact assessment via AI', icon: FaChartLine, color: '#0d9488', endpoint: null },
+];
+
 const mgmtFeatures = [
   { key: 'land-use', name: 'Land Use Management', desc: 'Track and manage land parcels and usage records', icon: FaMap, color: '#475569', endpoint: '/api/land-use' },
   { key: 'building-permits', name: 'Building Permits', desc: 'Process and manage building permit applications', icon: FaFileAlt, color: '#64748b', endpoint: '/api/building-permits' },
@@ -36,6 +46,7 @@ const Dashboard = () => {
   useEffect(() => {
     const allFeatures = [...aiFeatures, ...mgmtFeatures];
     allFeatures.forEach(async (f) => {
+      if (!f.endpoint) return;
       try {
         const res = await axios.get(f.endpoint, authHeader());
         const data = res.data;
@@ -80,6 +91,15 @@ const Dashboard = () => {
           </div>
           <div className="dashboard-grid">
             {aiFeatures.map((f, i) => renderCard(f, i, true))}
+          </div>
+        </div>
+
+        <div className="dashboard-section">
+          <div className="dashboard-section-title">
+            Advanced Tools <span className="ai-badge">New</span>
+          </div>
+          <div className="dashboard-grid">
+            {advancedFeatures.map((f, i) => renderCard(f, i, true))}
           </div>
         </div>
 

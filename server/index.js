@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const sequelize = require('./db');
 const auth = require('./middleware/auth');
 
@@ -19,12 +20,17 @@ const buildingPermitRoutes = require('./routes/buildingPermits');
 const districtZoneRoutes = require('./routes/districtZones');
 const transportationRouteRoutes = require('./routes/transportationRoutes');
 const publicFacilityRoutes = require('./routes/publicFacilities');
+const scenariosRoutes = require('./routes/scenarios');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(helmet());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3001',
+  credentials: true
+}));
 app.use(express.json());
 
 // Public routes (no auth required)
@@ -44,6 +50,11 @@ app.use('/api/building-permits', auth, buildingPermitRoutes);
 app.use('/api/district-zones', auth, districtZoneRoutes);
 app.use('/api/transportation-routes', auth, transportationRouteRoutes);
 app.use('/api/public-facilities', auth, publicFacilityRoutes);
+app.use('/api/scenarios', auth, scenariosRoutes);
+
+// Public permit tracker (unauthenticated)
+const buildingPermitPublicRoutes = require('./routes/buildingPermits');
+app.use('/api/public/building-permits', buildingPermitPublicRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -51,9 +62,23 @@ app.get('/api/health', (req, res) => {
 });
 
 // Start server
-sequelize.sync().then(() => {
+sequelize.sync({ force: false }).then(() => {
   console.log('Database synced successfully.');
-  app.listen(PORT, () => {
+  app.use('/api/zoning-scenario-optimizer', require('./routes/zoningScenarioOptimizer')); app.use('/api/infrastructure-impact-predictor', require('./routes/infrastructureImpactPredictor')); app.use('/api/environmental-compliance-checker', require('./routes/environmentalComplianceChecker')); app.use('/api/community-benefit-analyzer', require('./routes/communityBenefitAnalyzer')); app.use('/api/historic-preservation-advisor', require('./routes/historicPreservationAdvisor')); app.use('/api/public-comment-moderation', require('./routes/publicCommentModeration'));
+
+// === Batch 08 Gaps & Frontend Mounts ===
+app.use('/api/gap-critical-only-1-ai-endpoint-despite-scenario-compliance', require('./routes/gapCriticalOnly1AiEndpointDespiteScenarioCompliance'));
+app.use('/api/gap-no-conversational-planning-copilot-for-citizens-or-officials', require('./routes/gapNoConversationalPlanningCopilotForCitizensOrOfficials'));
+app.use('/api/gap-no-predictive-permit-approval-ml', require('./routes/gapNoPredictivePermitApprovalMl'));
+app.use('/api/gap-no-real-time-gis-integration-arcgis-qgis', require('./routes/gapNoRealTimeGisIntegrationArcgisQgis'));
+app.use('/api/gap-no-public-comment-stakeholder-feedback-system', require('./routes/gapNoPublicCommentStakeholderFeedbackSystem'));
+app.use('/api/gap-no-multi-year-zoning-amendment-tracking', require('./routes/gapNoMultiYearZoningAmendmentTracking'));
+app.use('/api/gap-no-density-far-calculation-utility', require('./routes/gapNoDensityFarCalculationUtility'));
+app.use('/api/gap-no-webhooks-notifications', require('./routes/gapNoWebhooksNotifications'));
+app.use('/api/gap-no-audit-logging', require('./routes/gapNoAuditLogging'));
+app.use('/api/gap-no-public-portal-citizen-self-service', require('./routes/gapNoPublicPortalCitizenSelfService'));
+
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }).catch(err => {
