@@ -61,6 +61,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Serve client build (single-port mode for verification)
+const path = require('path');
+const fs = require('fs');
+const clientBuildDir = path.join(__dirname, '..', 'client', 'build');
+if (fs.existsSync(clientBuildDir)) {
+  app.use(express.static(clientBuildDir));
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(clientBuildDir, 'index.html'));
+  });
+}
+
 // Start server
 sequelize.sync({ force: false }).then(() => {
   console.log('Database synced successfully.');

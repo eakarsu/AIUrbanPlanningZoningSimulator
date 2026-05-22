@@ -24,6 +24,11 @@ import ComplianceEngine from './pages/ComplianceEngine';
 import CitizenPortal from './pages/CitizenPortal';
 import ScenarioWorkbench from './pages/ScenarioWorkbench';
 import AIAdvisor from './pages/AIAdvisor';
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
+
 // === Batch 08 Gaps & Frontend Mounts ===
 import CfZoningScenarioOptimizerMaximizingAffordableHousingCommercial from './pages/CfZoningScenarioOptimizerMaximizingAffordableHousingCommercial'
 import CfInfrastructureImpactPredictorForSchoolsUtilitiesTransit from './pages/CfInfrastructureImpactPredictorForSchoolsUtilitiesTransit'
@@ -66,6 +71,10 @@ function App() {
         theme="colored"
       />
       <Routes>
+        <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/traffic-simulations" element={<ProtectedRoute><TrafficSimulations /></ProtectedRoute>} />
