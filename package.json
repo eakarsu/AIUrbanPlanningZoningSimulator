@@ -4,9 +4,12 @@
   "description": "AI Urban Planning & Zoning Simulator",
   "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test server/test/*.test.js",
+    "migrate": "bash scripts/migrate.sh apply-governed-zoning-001",
     "server": "nodemon server/index.js",
     "client": "cd client && react-scripts start",
-    "seed": "node server/seed.js",
+    "seed": "node server/seed-governed.js",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "dependencies": {

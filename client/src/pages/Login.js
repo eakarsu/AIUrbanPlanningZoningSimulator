@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import { toast } from 'react-toastify';
 import { FaCity } from 'react-icons/fa';
 
@@ -18,7 +18,7 @@ const Login = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
       toast.success('Login successful!');
       navigate('/dashboard');

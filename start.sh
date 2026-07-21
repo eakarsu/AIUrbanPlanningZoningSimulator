@@ -1,77 +1,8 @@
-#!/bin/bash
-
-set -e
-
-echo "=============================================="
-echo "  AI Urban Planning & Zoning Simulator"
-echo "  Starting Application..."
-echo "=============================================="
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-# Load env
-if [ -f .env ]; then
-  export $(cat .env | grep -v '^#' | xargs)
-fi
-
-BACKEND_PORT=${PORT:-4000}
-CLIENT_PORT=${CLIENT_PORT:-3000}
-
-# Kill processes on ports
-echo -e "${YELLOW}Cleaning up ports ${BACKEND_PORT} and ${CLIENT_PORT}...${NC}"
-lsof -ti:${BACKEND_PORT} 2>/dev/null | xargs kill -9 2>/dev/null || true
-lsof -ti:${CLIENT_PORT} 2>/dev/null | xargs kill -9 2>/dev/null || true
-sleep 1
-
-# Check PostgreSQL
-echo -e "${BLUE}Checking PostgreSQL...${NC}"
-if ! command -v psql &> /dev/null; then
-  echo -e "${RED}PostgreSQL is not installed. Please install it first.${NC}"
-  exit 1
-fi
-
-if ! pg_isready -q 2>/dev/null; then
-  echo -e "${YELLOW}Starting PostgreSQL...${NC}"
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    brew services start postgresql@14 2>/dev/null || brew services start postgresql 2>/dev/null || true
-  else
-    sudo systemctl start postgresql 2>/dev/null || true
-  fi
-  sleep 2
-fi
-
-# Create database if not exists
-echo -e "${BLUE}Setting up database...${NC}"
-psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'urban_planning'" 2>/dev/null | grep -q 1 || \
-  createdb -U postgres urban_planning 2>/dev/null || \
-  psql -tc "SELECT 1 FROM pg_database WHERE datname = 'urban_planning'" 2>/dev/null | grep -q 1 || \
-  createdb urban_planning 2>/dev/null || true
-
-# Install dependencies
-echo -e "${BLUE}Installing backend dependencies...${NC}"
-npm install
-
-echo -e "${BLUE}Installing frontend dependencies...${NC}"
-cd client && npm install && cd ..
-
-# Seed database
-echo -e "${GREEN}Seeding database...${NC}"
-node server/seed.js
-
-# Start application with hot reload
-echo -e "${GREEN}=============================================="
-echo -e "  Starting servers with hot reload..."
-echo -e "  Backend:  http://localhost:${BACKEND_PORT}"
-echo -e "  Frontend: http://localhost:${CLIENT_PORT}"
-echo -e "==============================================${NC}"
-
-npx concurrently \
-  --names "SERVER,CLIENT" \
-  --prefix-colors "blue,green" \
-  "npx nodemon --watch server server/index.js" \
-  "cd client && PORT=${CLIENT_PORT} npx react-scripts start"
+#!/usr/bin/env bash
+set -Eeuo pipefail
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"&&pwd)";BACKEND_PORT="${BACKEND_PORT:-${PORT:-4000}}";CLIENT_PORT="${FRONTEND_PORT:-${CLIENT_PORT:-3000}}";ALLOWED_ORIGINS="${ALLOWED_ORIGINS:-http://127.0.0.1:$CLIENT_PORT,http://localhost:$CLIENT_PORT}";PORT="$BACKEND_PORT";export BACKEND_PORT PORT CLIENT_PORT ALLOWED_ORIGINS
+for directory in "$PROJECT_DIR/node_modules" "$PROJECT_DIR/client/node_modules";do [[ -d "$directory" ]]||{ echo "Missing dependencies. Run ./scripts/bootstrap.sh explicitly." >&2;exit 1;};done
+: "${DATABASE_URL:?DATABASE_URL is required}";: "${JWT_SECRET:?JWT_SECRET is required}";[[ ${#JWT_SECRET} -ge 32 ]]||{ echo "JWT_SECRET must contain at least 32 characters." >&2;exit 1;}
+for port in "$BACKEND_PORT" "$CLIENT_PORT";do if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1;then echo "Port $port is already in use; no process was changed." >&2;exit 1;fi;done
+backend_pid='';client_pid='';cleanup(){ [[ -z "$client_pid" ]]||kill "$client_pid" 2>/dev/null||true;[[ -z "$backend_pid" ]]||kill "$backend_pid" 2>/dev/null||true;};trap cleanup EXIT INT TERM
+(cd "$PROJECT_DIR"&&PORT="$BACKEND_PORT" node server/index.js)&backend_pid=$!;(cd "$PROJECT_DIR/client"&&PORT="$CLIENT_PORT" REACT_APP_API_URL="http://127.0.0.1:$BACKEND_PORT/api" BROWSER=none npm start)&client_pid=$!;echo "Governed zoning API: http://localhost:$BACKEND_PORT";echo "Client: http://localhost:$CLIENT_PORT";wait "$backend_pid" "$client_pid"
