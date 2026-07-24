@@ -11,4 +11,4 @@ router.post('/login',async(req,res)=>{try{
   const row=result.rows[0];if(!row||!await bcrypt.compare(password,row.password_hash))return res.status(401).json({error:'Invalid credentials'});
   const user={id:row.id,email:row.email,name:row.name,tenantId:row.tenant_id,role:row.role},token=jwt.sign(user,secret(),{issuer:'governed-zoning',algorithm:'HS256',expiresIn:process.env.JWT_TTL||'1h'});res.json({token,user});
 }catch(_error){res.status(500).json({error:'Login failed'});}});
-router.get('/me',authenticate,(req,res)=>res.json({user:req.user}));module.exports=router;
+router.get('/me',authenticate,async(req,res)=>{try{const result=await pool.query('SELECT u.id,u.email,u.name,m.tenant_id AS "tenantId",m.role FROM zoning_users u JOIN zoning_memberships m ON m.user_id=u.id AND m.active=TRUE WHERE u.id=$1 AND m.tenant_id=$2',[req.user.id,req.user.tenantId]);if(!result.rows[0])return res.status(404).json({error:'User not found'});res.json({user:result.rows[0]});}catch(_error){res.status(500).json({error:'Identity lookup failed'});}});module.exports=router;
