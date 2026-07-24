@@ -7,6 +7,12 @@ const {
   LandUse, BuildingPermit, DistrictZone, TransportationRoute, PublicFacility
 } = require('./models');
 
+function requireDemoPassword() {
+  const password = process.env.DEMO_PASSWORD || process.env.SEED_DEMO_PASSWORD || process.env.DEMO_SEED_PASSWORD || '';
+  if (password.length < 12 || password.length > 1024) throw new Error('DEMO_PASSWORD must contain 12-1024 characters');
+  return password;
+}
+
 const seed = async () => {
   try {
     console.log('Connecting to database...');
@@ -19,7 +25,7 @@ const seed = async () => {
 
     // --- User ---
     console.log('Seeding Users...');
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash(requireDemoPassword(), 10);
     await User.create({ email: 'admin@urbanplanning.com', password: hashedPassword, name: 'Admin User' });
     console.log('  Created default admin user.');
 
@@ -276,7 +282,7 @@ const seed = async () => {
     console.log('  Created 15 public facilities.');
 
     console.log('\nSeed completed successfully!');
-    console.log('Default login: admin@urbanplanning.com / admin123');
+    console.log('Demo login users provisioned from the local environment.');
     process.exit(0);
   } catch (err) {
     console.error('Seed failed:', err);
