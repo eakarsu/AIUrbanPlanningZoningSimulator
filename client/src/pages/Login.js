@@ -70,7 +70,7 @@ const Login = () => {
           </button>
           <div className="login-divider">or</div>
           <button type="button" className="login-quick-btn" onClick={handleQuickLogin}>
-            Quick Login (Demo Account)
+            Auto Fill Demo Credentials
           </button>
         </form>
       </div>
