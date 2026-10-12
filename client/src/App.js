@@ -1,3 +1,4 @@
+import AIReportLibrary from "./components/AIReportLibrary";
 import { useLocation } from 'react-router-dom';
 import AppSidebar from './components/AppSidebar';
 import React from 'react';
@@ -68,7 +69,7 @@ function SidebarFrame({ children }) {
 
 function App() {
   return (
-    <div className="App">
+    <><AIReportLibrary floating /><div className="App">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -124,7 +125,7 @@ function App() {
       <Route path="/gap-no-audit-logging" element={<ProtectedRoute><GapNoAuditLogging /></ProtectedRoute>} />
       <Route path="/gap-no-public-portal-citizen-self-service" element={<ProtectedRoute><GapNoPublicPortalCitizenSelfService /></ProtectedRoute>} />
       </Routes></SidebarFrame>
-    </div>
+    </div></>
   );
 }
 

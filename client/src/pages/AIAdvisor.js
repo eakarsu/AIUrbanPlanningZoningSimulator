@@ -1,8 +1,10 @@
+import NativeAIControls from "../components/NativeAIControls.jsx";
 import React, { useState } from 'react';
 import { FaExchangeAlt, FaChartLine, FaBalanceScale, FaShieldAlt, FaLandmark, FaCogs, FaUsers, FaCalculator } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import AIReport from '../components/AIReport';
 
 // Surfaces the AI endpoints added in apply pass 2:
 //   POST /api/ai/scenario-compare
@@ -231,7 +233,7 @@ export default function AIAdvisor() {
           parking_ratio_per_unit: Number(farPark),
         });
       }
-      setOutput(res.data?.analysis || res.data);
+      setOutput(res.data?.analysis ?? res.data);
       toast.success(active === 'density-far-calc' ? 'Calculation complete' : 'AI analysis complete');
     } catch (err) {
       const msg = err.response?.data?.error || err.message || 'AI request failed';
@@ -250,7 +252,7 @@ export default function AIAdvisor() {
   const ToolIcon = (TOOLS.find((t) => t.key === active) || TOOLS[0]).icon;
 
   return (
-    <div>
+    <NativeAIControls busy={running} context="urban planning"><div>
       <Navbar currentPage="AI Advisor" />
       <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto' }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -303,7 +305,7 @@ export default function AIAdvisor() {
           {active === 'scenario-compare' && (
             <>
               <label style={{ fontWeight: 600 }}>Scenarios (JSON array, ≥2 items)</label>
-              <textarea
+              <textarea data-ai-field={"scenariosText"}
                 rows={10}
                 value={scenariosText}
                 onChange={(e) => setScenariosText(e.target.value)}
@@ -312,7 +314,7 @@ export default function AIAdvisor() {
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>
                 Criteria (JSON array — optional)
               </label>
-              <textarea
+              <textarea data-ai-field={"criteriaText"}
                 rows={4}
                 value={criteriaText}
                 onChange={(e) => setCriteriaText(e.target.value)}
@@ -324,14 +326,14 @@ export default function AIAdvisor() {
           {active === 'impact-assessment' && (
             <>
               <label style={{ fontWeight: 600 }}>Project (JSON)</label>
-              <textarea
+              <textarea data-ai-field={"projectText"}
                 rows={8}
                 value={projectText}
                 onChange={(e) => setProjectText(e.target.value)}
                 style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }}
               />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Location</label>
-              <input
+              <input data-ai-field={"location"}
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -340,7 +342,7 @@ export default function AIAdvisor() {
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>
                 Parameters (JSON — optional)
               </label>
-              <textarea
+              <textarea data-ai-field={"paramsText"}
                 rows={4}
                 value={paramsText}
                 onChange={(e) => setParamsText(e.target.value)}
@@ -352,14 +354,14 @@ export default function AIAdvisor() {
           {active === 'compliance-analysis' && (
             <>
               <label style={{ fontWeight: 600 }}>Project (JSON)</label>
-              <textarea
+              <textarea data-ai-field={"complianceProjectText"}
                 rows={8}
                 value={complianceProjectText}
                 onChange={(e) => setComplianceProjectText(e.target.value)}
                 style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }}
               />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Jurisdiction</label>
-              <input
+              <input data-ai-field={"jurisdiction"}
                 type="text"
                 value={jurisdiction}
                 onChange={(e) => setJurisdiction(e.target.value)}
@@ -368,7 +370,7 @@ export default function AIAdvisor() {
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>
                 Frameworks (JSON array — optional)
               </label>
-              <textarea
+              <textarea data-ai-field={"frameworksText"}
                 rows={5}
                 value={frameworksText}
                 onChange={(e) => setFrameworksText(e.target.value)}
@@ -380,24 +382,24 @@ export default function AIAdvisor() {
           {active === 'scenario-optimizer' && (
             <>
               <label style={{ fontWeight: 600 }}>Site (JSON)</label>
-              <textarea rows={6} value={optimizerSiteText} onChange={(e) => setOptimizerSiteText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"optimizerSiteText"} rows={6} value={optimizerSiteText} onChange={(e) => setOptimizerSiteText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Constraints (JSON)</label>
-              <textarea rows={5} value={optimizerConstraintsText} onChange={(e) => setOptimizerConstraintsText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"optimizerConstraintsText"} rows={5} value={optimizerConstraintsText} onChange={(e) => setOptimizerConstraintsText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Objectives (JSON array, descending priority)</label>
-              <textarea rows={4} value={optimizerObjectivesText} onChange={(e) => setOptimizerObjectivesText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"optimizerObjectivesText"} rows={4} value={optimizerObjectivesText} onChange={(e) => setOptimizerObjectivesText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
             </>
           )}
 
           {active === 'community-benefit-analyzer' && (
             <>
               <label style={{ fontWeight: 600 }}>Project (JSON)</label>
-              <textarea rows={6} value={cbProjectText} onChange={(e) => setCbProjectText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"cbProjectText"} rows={6} value={cbProjectText} onChange={(e) => setCbProjectText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Demographics (JSON)</label>
-              <textarea rows={4} value={cbDemographicsText} onChange={(e) => setCbDemographicsText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"cbDemographicsText"} rows={4} value={cbDemographicsText} onChange={(e) => setCbDemographicsText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Existing Amenities (JSON)</label>
-              <textarea rows={4} value={cbAmenitiesText} onChange={(e) => setCbAmenitiesText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"cbAmenitiesText"} rows={4} value={cbAmenitiesText} onChange={(e) => setCbAmenitiesText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Equity Priorities (JSON array)</label>
-              <textarea rows={3} value={cbEquityText} onChange={(e) => setCbEquityText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
+              <textarea data-ai-field={"cbEquityText"} rows={3} value={cbEquityText} onChange={(e) => setCbEquityText(e.target.value)} style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }} />
             </>
           )}
 
@@ -405,14 +407,14 @@ export default function AIAdvisor() {
             <>
               <p style={{ color: '#475569' }}>Deterministic calculation — runs without an AI key.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
-                <label>Lot size (sqft)<input type="number" value={farLot} onChange={(e) => setFarLot(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>FAR<input type="number" step="0.1" value={farFar} onChange={(e) => setFarFar(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Max height (ft)<input type="number" value={farHeight} onChange={(e) => setFarHeight(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Floor-to-floor (ft)<input type="number" step="0.5" value={farF2F} onChange={(e) => setFarF2F(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Lot coverage (%)<input type="number" value={farCov} onChange={(e) => setFarCov(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Avg unit size (sqft)<input type="number" value={farUnit} onChange={(e) => setFarUnit(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Open space (%)<input type="number" value={farOpen} onChange={(e) => setFarOpen(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
-                <label>Parking ratio /unit<input type="number" step="0.25" value={farPark} onChange={(e) => setFarPark(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Lot size (sqft)<input data-ai-field={"farLot"} type="number" value={farLot} onChange={(e) => setFarLot(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>FAR<input data-ai-field={"farFar"} type="number" step="0.1" value={farFar} onChange={(e) => setFarFar(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Max height (ft)<input data-ai-field={"farHeight"} type="number" value={farHeight} onChange={(e) => setFarHeight(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Floor-to-floor (ft)<input data-ai-field={"farF2F"} type="number" step="0.5" value={farF2F} onChange={(e) => setFarF2F(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Lot coverage (%)<input data-ai-field={"farCov"} type="number" value={farCov} onChange={(e) => setFarCov(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Avg unit size (sqft)<input data-ai-field={"farUnit"} type="number" value={farUnit} onChange={(e) => setFarUnit(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Open space (%)<input data-ai-field={"farOpen"} type="number" value={farOpen} onChange={(e) => setFarOpen(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
+                <label>Parking ratio /unit<input data-ai-field={"farPark"} type="number" step="0.25" value={farPark} onChange={(e) => setFarPark(e.target.value)} style={{ width: '100%', padding: '0.5rem' }} /></label>
               </div>
             </>
           )}
@@ -420,14 +422,14 @@ export default function AIAdvisor() {
           {active === 'historic-preservation-advisor' && (
             <>
               <label style={{ fontWeight: 600 }}>Project (JSON)</label>
-              <textarea
+              <textarea data-ai-field={"hpProjectText"}
                 rows={6}
                 value={hpProjectText}
                 onChange={(e) => setHpProjectText(e.target.value)}
                 style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }}
               />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Site (JSON)</label>
-              <textarea
+              <textarea data-ai-field={"siteText"}
                 rows={5}
                 value={siteText}
                 onChange={(e) => setSiteText(e.target.value)}
@@ -436,14 +438,14 @@ export default function AIAdvisor() {
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>
                 Historic Resources (JSON array)
               </label>
-              <textarea
+              <textarea data-ai-field={"historicResourcesText"}
                 rows={5}
                 value={historicResourcesText}
                 onChange={(e) => setHistoricResourcesText(e.target.value)}
                 style={{ width: '100%', fontFamily: 'monospace', padding: '0.5rem', marginTop: '0.25rem' }}
               />
               <label style={{ fontWeight: 600, marginTop: '0.75rem', display: 'block' }}>Jurisdiction</label>
-              <input
+              <input data-ai-field={"hpJurisdiction"}
                 type="text"
                 value={hpJurisdiction}
                 onChange={(e) => setHpJurisdiction(e.target.value)}
@@ -484,26 +486,13 @@ export default function AIAdvisor() {
             </div>
           )}
 
-          {output && (
+          {output !== null && output !== undefined && (
             <div style={{ marginTop: '1.25rem' }}>
-              <strong>Result</strong>
-              <pre
-                style={{
-                  background: '#0f172a',
-                  color: '#e2e8f0',
-                  padding: '1rem',
-                  borderRadius: 6,
-                  overflow: 'auto',
-                  fontSize: 13,
-                  marginTop: '0.5rem',
-                }}
-              >
-                {typeof output === 'string' ? output : JSON.stringify(output, null, 2)}
-              </pre>
+              <AIReport response={output} title={TOOLS.find((t) => t.key === active)?.title || 'Planning result'} />
             </div>
           )}
         </div>
       </div>
-    </div>
+    </div></NativeAIControls>
   );
 }

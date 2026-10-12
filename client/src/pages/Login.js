@@ -30,8 +30,14 @@ const Login = () => {
   };
 
   const handleQuickLogin = () => {
-    setEmail(process.env.REACT_APP_DEMO_EMAIL || '');
-    setPassword(process.env.REACT_APP_DEMO_PASSWORD || '');
+    const demoEmail = process.env.REACT_APP_DEMO_EMAIL;
+    const demoPassword = process.env.REACT_APP_DEMO_PASSWORD;
+    if (!demoEmail || !demoPassword) {
+      toast.info('Demo credentials are not configured. Ask the project administrator for access.');
+      return;
+    }
+    setEmail(demoEmail);
+    setPassword(demoPassword);
   };
 
   return (
@@ -70,7 +76,7 @@ const Login = () => {
           </button>
           <div className="login-divider">or</div>
           <button type="button" className="login-quick-btn" onClick={handleQuickLogin}>
-            Auto Fill Demo Credentials
+            Fill Demo Credentials
           </button>
         </form>
       </div>

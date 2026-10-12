@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { FaShieldAlt, FaCheck, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import AIReport from '../components/AIReport';
 
 export default function ComplianceEngine() {
   const [permits, setPermits] = useState([]);
@@ -167,7 +168,7 @@ export default function ComplianceEngine() {
                 {loading ? (
                   <div style={{ color: '#64748b', padding: 20, textAlign: 'center' }}>Generating justification...</div>
                 ) : (
-                  <div style={{ whiteSpace: 'pre-wrap', color: '#cbd5e1', fontSize: 13, lineHeight: 1.6 }}>{aiJustification || 'No narrative yet'}</div>
+                  (aiJustification !== null && aiJustification !== undefined && aiJustification !== '' ? <AIReport response={aiJustification} title="AI Justification" /> : 'No narrative yet')
                 )}
               </div>
             )}

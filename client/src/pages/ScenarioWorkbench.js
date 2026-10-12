@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { FaCopy, FaPlay, FaExchangeAlt, FaFileExport } from 'react-icons/fa';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import AIReport from '../components/AIReport';
 
 const MUTATIONS = [
   { kind: 'rezone', label: 'Rezone block (R1 → R3)' },
@@ -209,7 +210,7 @@ export default function ScenarioWorkbench() {
         {aiReport && (
           <div style={cardStyle}>
             <h3 style={{ marginTop: 0, fontSize: 15 }}>AI Report</h3>
-            <div style={{ whiteSpace: 'pre-wrap', color: '#cbd5e1', fontSize: 13, lineHeight: 1.6 }}>{aiReport}</div>
+            <AIReport response={aiReport} title="AI Report" />
           </div>
         )}
 
@@ -219,6 +220,7 @@ export default function ScenarioWorkbench() {
             scenarios.map(s => (
               <div key={s.id} style={{ padding: 10, borderBottom: '1px solid rgba(51,65,85,0.4)', fontSize: 13 }}>
                 <strong style={{ color: '#f1f5f9' }}>{s.name}</strong> — {s.mutations.length} mutations · saved {new Date(s.saved_at).toLocaleString()}
+                {s.ai_report !== null && s.ai_report !== undefined && s.ai_report !== '' && <details><summary>View saved AI report</summary><AIReport response={s.ai_report} title={`${s.name} report`} /></details>}
               </div>
             ))}
         </div>

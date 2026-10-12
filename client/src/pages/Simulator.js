@@ -3,11 +3,17 @@ import { toast } from 'react-toastify';
 import { FaPlay, FaCar, FaUsers, FaChartLine } from 'react-icons/fa';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import AIReport from '../components/AIReport';
 
 const TRAFFIC_PRESETS = [
-  { label: 'Highway peak', vph: 4500, lanes: 4, intersections: 0 },
-  { label: 'Arterial peak', vph: 1800, lanes: 2, intersections: 6 },
-  { label: 'Residential', vph: 350, lanes: 2, intersections: 12 },
+  { label: 'Highway peak', vph: 4500, lanes: 4, intersections: 0, signal_cycle: 90, peak_hour_factor: 0.94 },
+  { label: 'Arterial peak', vph: 1800, lanes: 2, intersections: 6, signal_cycle: 110, peak_hour_factor: 0.92 },
+  { label: 'Residential', vph: 350, lanes: 2, intersections: 12, signal_cycle: 75, peak_hour_factor: 0.86 },
+];
+const POPULATION_PRESETS = [
+  { label: 'Stable district', population: 50000, growth_rate: 0.4, fertility: 1.7, migration: 100, years: 10 },
+  { label: 'Growing corridor', population: 75000, growth_rate: 2.1, fertility: 1.8, migration: 900, years: 15 },
+  { label: 'Long range plan', population: 120000, growth_rate: 1.2, fertility: 1.6, migration: 450, years: 20 },
 ];
 
 export default function Simulator() {
@@ -100,7 +106,7 @@ export default function Simulator() {
               <>
                 {TRAFFIC_PRESETS.map(p => (
                   <button key={p.label} className="btn btn-secondary" style={{ marginRight: 6, marginBottom: 6, fontSize: 11 }}
-                    onClick={() => setTParams({ ...tParams, vph: p.vph, lanes: p.lanes, intersections: p.intersections })}>
+                    type="button" onClick={() => setTParams({ vph: p.vph, lanes: p.lanes, intersections: p.intersections, signal_cycle: p.signal_cycle, peak_hour_factor: p.peak_hour_factor })}>
                     {p.label}
                   </button>
                 ))}
@@ -113,6 +119,12 @@ export default function Simulator() {
               </>
             ) : (
               <>
+                {POPULATION_PRESETS.map(p => (
+                  <button key={p.label} type="button" className="btn btn-secondary" style={{ marginRight: 6, marginBottom: 6, fontSize: 11 }}
+                    onClick={() => setPParams({ population: p.population, growth_rate: p.growth_rate, fertility: p.fertility, migration: p.migration, years: p.years })}>
+                    {p.label}
+                  </button>
+                ))}
                 {Object.entries(pParams).map(([k, v]) => (
                   <div key={k} style={{ marginBottom: 12 }}>
                     <label style={labelStyle}>{k.replace(/_/g, ' ')}</label>
@@ -172,7 +184,7 @@ export default function Simulator() {
             {aiNarrative && (
               <div style={{ ...cardStyle, marginTop: 12 }}>
                 <h3 style={{ marginTop: 0 }}>AI Narrative</h3>
-                <div style={{ whiteSpace: 'pre-wrap', color: '#cbd5e1', fontSize: 13, lineHeight: 1.6 }}>{aiNarrative}</div>
+                <AIReport response={aiNarrative} title="AI Narrative" />
               </div>
             )}
           </div>
