@@ -7,7 +7,7 @@ const DetailModal = ({ item, fields, onClose, onEdit, onDelete, aiAnalysis, aiLo
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{item.name || item.permitNumber || 'Item Details'}</h2>
           <button className="modal-close" onClick={onClose}><FaTimes /></button>
@@ -31,11 +31,14 @@ const DetailModal = ({ item, fields, onClose, onEdit, onDelete, aiAnalysis, aiLo
           </div>
 
           <div className="detail-actions">
-            <button className="btn btn-primary" onClick={() => onEdit(item)}>
+            <button className="btn btn-primary" onClick={() => onEdit ? onEdit(item) : onClose()}>
               <FaEdit /> Edit
             </button>
-            <button className="btn btn-danger" onClick={() => onDelete(item)}>
+            <button className="btn btn-danger" onClick={() => onDelete ? onDelete(item) : onClose()}>
               <FaTrash /> Delete
+            </button>
+            <button className="btn btn-secondary" onClick={onClose}>
+              Cancel
             </button>
             {isAIFeature && (
               <button className="btn btn-ai" onClick={() => onRunAI(item)} disabled={aiLoading}>

@@ -44,7 +44,7 @@ const FormModal = ({ fields, item, onSave, onClose, title }) => {
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title || (item ? 'Edit Item' : 'Add New Item')}</h2>
           <button className="modal-close" onClick={onClose}><FaTimes /></button>

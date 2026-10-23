@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
+import DetailModal from './DetailModal';
 import { FaSortUp, FaSortDown, FaSort, FaEdit, FaTrash, FaSearch, FaInbox } from 'react-icons/fa';
 
 const DataTable = ({ columns, data, onRowClick, onDelete, onEdit }) => {
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState('');
   const [sortDir, setSortDir] = useState('asc');
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -100,7 +102,7 @@ const DataTable = ({ columns, data, onRowClick, onDelete, onEdit }) => {
               </tr>
             ) : (
               filteredData.map((row) => (
-                <tr key={row.id} onClick={() => onRowClick && onRowClick(row)}>
+                <tr key={row.id} onClick={() => onRowClick ? onRowClick(row) : setSelectedRow(row)}>
                   {columns.map((col) => (
                     <td key={col.key}>{renderCellValue(col, row[col.key])}</td>
                   ))}
@@ -120,6 +122,7 @@ const DataTable = ({ columns, data, onRowClick, onDelete, onEdit }) => {
           </tbody>
         </table>
       </div>
+      <DetailModal item={selectedRow} fields={columns || []} onClose={() => setSelectedRow(null)} onEdit={onEdit} onDelete={onDelete} />
     </div>
   );
 };
